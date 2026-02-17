@@ -1,0 +1,6 @@
+sample_name,sex,age,batch,ventricle,condition,include,group_id,group_label,diagnosis,species,tissue,disease_group
+c15_12,Male,71,B2,LV,Control,TRUE,1,All_Samples,Aspiration pneumonia & Multiple system atrophy,human,Choroid_Plexus,Control
+c15_17,Female,74,B2,LV,Control,TRUE,1,All_Samples,Aspiration pneumonia & Frontotemporal lobar degeneration,human,Choroid_Plexus,Control
+c16_18,Male,78,B2,LV,Control,TRUE,1,All_Samples,Aspiration pneumonia & Alzheimers disease,human,Choroid_Plexus,Control
+CP_90,Male,69,B3,LV,COVID-19,TRUE,1,All_Samples,COVID-19 Interstitial pneumonia Dilated heart disease,human,Choroid_Plexus,COVID-19
+CP_91,Female,69,B3,LV,COVID-19,TRUE,1,All_Samples,COVID-19 Hypovolemic shock Aortic aneurysm rupture,human,Choroid_Plexus,COVID-19

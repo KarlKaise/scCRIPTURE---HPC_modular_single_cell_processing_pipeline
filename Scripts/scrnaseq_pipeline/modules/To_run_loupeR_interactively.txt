@@ -1,0 +1,20 @@
+# Start interactive session with enough memory
+srun --time=2:00:00 --mem=64G --cpus-per-task=4 --pty bash
+
+conda activate R_4_5
+
+# Set environment variables
+export PIPELINE_DIR="/scicore/home/doetsch/kaiser0001/Revision_NatureComm_Sex/Vandebroucke_fibroblast_paper/Scripts/scrnaseq_pipeline"
+export DOWNSTREAM_DIR="/scicore/home/doetsch/kaiser0001/Revision_NatureComm_Sex/Vandebroucke_fibroblast_paper/Output_dir_Fibroblast_vandenbroucke/Single_cell_clustering"
+export PREPROCESS_DIR="/scicore/home/doetsch/kaiser0001/Revision_NatureComm_Sex/Vandebroucke_fibroblast_paper/Output_dir_Fibroblast_vandenbroucke/Single_cell_preprocessed"
+export DATASET_NAME="Fibroblast_vandenbroucke"
+export VENTRICLE_FILTER="LV"
+export GROUP_ID="1"
+export GROUP_LABEL="Lateral_Ventricle"
+
+# Run R and source the modules
+R
+
+# In R:
+source(file.path(Sys.getenv("PIPELINE_DIR"), "modules", "10_final_summary.R"))
+source(file.path(Sys.getenv("PIPELINE_DIR"), "modules", "11_html_report.R"))

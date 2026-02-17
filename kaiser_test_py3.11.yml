@@ -1,0 +1,165 @@
+# ==============================================================================
+# Conda Environment: kaiser_test_py3.11
+# ==============================================================================
+# INSTALLATION (4-step process):
+#
+#   1. Create conda environment (Python + R + Julia + conda packages):
+#        conda env create -f kaiser_test_py3.11.yml
+#        conda activate kaiser_test_py3.11
+#
+#   2. Install Python pip packages via uv (much faster than pip):
+#        pip install uv
+#        uv pip install -r requirements.txt
+#
+#   3. Install R packages not available in conda (GitHub-only):
+#        Rscript install_r_packages.R
+#
+#   4. Install scAURA & set up Julia/scICE:
+#        bash install_tools.sh
+#
+# NOTE: This environment includes CUDA 12.1 GPU packages (RAPIDS, PyTorch,
+#       TensorFlow). If you don't have a compatible GPU, remove the GPU
+#       sections from requirements.txt.
+# ==============================================================================
+
+name: kaiser_test_py3.11
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  # --------------------------------------------------------------------------
+  # Python
+  # --------------------------------------------------------------------------
+  - python=3.11
+  - pip
+
+  # ==========================================================================
+  #                        R ENVIRONMENT
+  # ==========================================================================
+
+  # --------------------------------------------------------------------------
+  # R base + build tools
+  # --------------------------------------------------------------------------
+  - r-base>=4.4
+  - r-devtools
+  - r-remotes
+  - r-biocmanager
+  - r-rcpp
+  - r-rcpparmadillo
+  - r-rcppeigen
+
+  # --------------------------------------------------------------------------
+  # Seurat ecosystem
+  # --------------------------------------------------------------------------
+  - r-seurat
+  - r-seuratobject
+
+  # --------------------------------------------------------------------------
+  # CRAN packages (core tidyverse / plotting)
+  # --------------------------------------------------------------------------
+  - r-ggplot2
+  - r-dplyr
+  - r-tidyr
+  - r-patchwork
+  - r-reshape2
+  - r-matrix
+  - r-ggrepel
+  - r-ggnewscale
+  - r-ragg
+  - r-scales
+  - r-viridis
+  - r-rcolorbrewer
+  - r-cowplot
+  - r-gridextra
+  - r-data.table
+  - r-stringr
+  - r-tibble
+  - r-readr
+  - r-purrr
+  - r-forcats
+
+  # --------------------------------------------------------------------------
+  # CRAN packages (computation / stats)
+  # --------------------------------------------------------------------------
+  - r-future
+  - r-future.apply
+  - r-cluster
+  - r-reticulate
+  - r-igraph
+  - r-irlba
+  - r-rann
+  - r-uwot
+  - r-lmtest
+  - r-pbapply
+  - r-htmltools
+  - r-htmlwidgets
+  - r-r.utils
+  - r-hdf5r
+
+  # --------------------------------------------------------------------------
+  # CRAN packages (specialized)
+  # --------------------------------------------------------------------------
+  - r-harmony                       # Harmony integration (CRAN version)
+
+  # --------------------------------------------------------------------------
+  # Bioconductor packages (via bioconda)
+  # --------------------------------------------------------------------------
+  - bioconductor-deseq2             # Differential expression (bulk / pseudo-bulk)
+  - bioconductor-dropletutils       # Empty droplet detection
+  - bioconductor-singlecellexperiment  # SCE data structure
+  - bioconductor-scdblfinder        # Doublet detection
+  - bioconductor-decontx            # Ambient RNA decontamination
+  - bioconductor-mast               # DE testing for scRNA-seq
+  - bioconductor-zellkonverter      # h5ad <-> SCE conversion
+  - bioconductor-scrnaseq           # Reference scRNA-seq datasets
+  - bioconductor-scran              # Normalization / feature selection
+  - bioconductor-scater             # QC / visualization
+  - bioconductor-scuttle            # SC utilities
+  - bioconductor-biocgenerics
+  - bioconductor-summarizedexperiment
+  - bioconductor-s4vectors
+  - bioconductor-genomicranges
+  - bioconductor-limma
+  - bioconductor-edger
+  - bioconductor-glmgampoi          # Fast GLM for scRNA-seq (Seurat v5)
+  - bioconductor-complexheatmap     # Heatmaps
+  - bioconductor-basilisk           # Python env management for R/Bioc
+
+  # ==========================================================================
+  #                     JULIA ENVIRONMENT (scICE / scLENS)
+  # ==========================================================================
+  # Julia <1.12.3 required (PyCall crash in 1.12.3)
+  # After conda install, run install_tools.sh to set up Julia packages.
+  # --------------------------------------------------------------------------
+  - julia>=1.10,<1.12.3
+
+  # ==========================================================================
+  #                     PYTHON CONDA-ONLY PACKAGES
+  # ==========================================================================
+  # Packages that install more reliably via conda than pip.
+  # All other Python packages are installed via uv (see requirements.txt).
+  # --------------------------------------------------------------------------
+  - scanpy=1.9.8
+  - anndata=0.10.9
+  - leidenalg=0.10.2
+  - python-igraph=0.11.6
+  - celltypist=1.6.3
+  - gseapy=1.1.11
+  - mygene=3.2.2
+  - fastobo=0.12.3
+  - hdf5=1.14.3
+  - pytorch_geometric=2.7.0
+  - graphviz
+  - pandoc=3.4
+  - nodejs=22.9.0
+  - pyqt=5.15.9
+  - pyside6=6.7.2
+
+  # ==========================================================================
+  # NOTE: All remaining Python packages (PyTorch, TensorFlow, RAPIDS, scvi-tools,
+  #       visualization, etc.) are installed via:
+  #         pip install uv
+  #         uv pip install -r requirements.txt
+  # ==========================================================================

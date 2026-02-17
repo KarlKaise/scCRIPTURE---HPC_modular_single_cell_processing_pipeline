@@ -1,0 +1,113 @@
+# ==============================================================================
+# .gitignore — Universal Modular scRNA-seq Pipeline
+# ==============================================================================
+
+# ── Output data (large, generated) ──────────────────────────────────────────
+Output_dir_*/
+Complete_FASTQ/
+logs/
+
+# ── R artifacts ─────────────────────────────────────────────────────────────
+*.RData
+*.rds
+*.Rds
+*.RDS
+*.Rhistory
+*.Rproj.user
+.Rproj.user/
+*.Rout
+Rplots.pdf
+
+# ── Python artifacts ────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+*.ipynb_checkpoints/
+.ipynb_checkpoints/
+
+# ── Conda / virtual environments ────────────────────────────────────────────
+.conda/
+.venv/
+venv/
+env/
+
+# ── Data files (too large for git) ──────────────────────────────────────────
+*.h5
+*.h5ad
+*.h5seurat
+*.loom
+*.mtx
+*.mtx.gz
+*.bam
+*.bai
+*.cram
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+*.bcf
+*.vcf
+*.vcf.gz
+*.bed
+*.bedGraph
+*.bigWig
+*.bw
+*.tbi
+*.csi
+*.zarr/
+*.ome.zarr/
+
+# ── Large binary / image files ──────────────────────────────────────────────
+*.tif
+*.tiff
+*.nd2
+*.czi
+*.lif
+*.vsi
+*.svs
+
+# ── Cell Ranger outputs ─────────────────────────────────────────────────────
+**/outs/
+**/SC_RNA_COUNTER_CS/
+
+# ── Compressed archives ─────────────────────────────────────────────────────
+*.tar.gz
+*.tar.bz2
+*.zip
+
+# ── OS files ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+*.swp
+*.swo
+
+# ── IDE / editor ────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Jupyter ─────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Backup / temp files ─────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.orig
+modules/Backup/
+
+# ── NMF / intermediate processing ───────────────────────────────────────────
+NMF_*/
+progressbar_*/
+
+# ── SLURM job files ─────────────────────────────────────────────────────────
+slurm-*.out
+slurm-*.err
+**/Rplots.pdf 
+**/Backup/ 

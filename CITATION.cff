@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "scCRIPTURE — Modular HPC Single-Cell scRNA-seq Bioinformatics Pipeline"
+message: "If you use this pipeline, please cite it as below."
+type: software
+authors:
+  - family-names: Kaiser
+    given-names: Karol
+    affiliation: "Doetsch Lab, Biozentrum, University of Basel"
+repository-code: "https://github.com/KarlKaise/scCRIPTURE---HPC_modular_single_cell_processing_pipeline"
+license: MIT
+keywords:
+  - single-cell RNA-seq
+  - scRNA-seq
+  - bioinformatics
+  - pipeline
+  - SLURM
+  - HPC
+  - Cell Ranger
+  - CHOIR
+  - scAURA
+  - DESeq2
+  - spatial transcriptomics
+  - cell type annotation
+  - MapMyCells

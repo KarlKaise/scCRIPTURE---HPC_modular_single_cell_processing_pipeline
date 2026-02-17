@@ -1,0 +1,298 @@
+# ==============================================================================
+# Python Environment: kaiser_test_py3.11
+# ==============================================================================
+# Install via uv (recommended, much faster):
+#   pip install uv
+#   uv pip install -r requirements.txt
+#
+# Or via plain pip (slower):
+#   pip install -r requirements.txt
+#
+# Python:  3.11
+#
+# NOTE: This file covers PYTHON pip packages only. For the full environment use
+#       the 4-step installation process:
+#         1. conda env create -f kaiser_test_py3.11.yml  (Python + R + Julia + conda pkgs)
+#         2. pip install uv && uv pip install -r requirements.txt  (Python pip pkgs)
+#         3. Rscript install_r_packages.R                (GitHub-only R pkgs)
+#         4. bash install_tools.sh                       (scAURA + scICE)
+#
+#       Alternatively, steps 2 + 4 can be combined by running install_tools.sh
+#       which handles uv installation and requirements.txt automatically.
+#
+# NOTE: Some packages (scanpy, leidenalg, igraph, celltypist, gseapy) install
+#       more reliably via conda. See kaiser_test_py3.11.yml for the recommended
+#       conda-based installation.
+#
+# NOTE: PyTorch and DGL require the CUDA 12.1 index URL below.
+#       Remove --extra-index-url lines and GPU sections if no NVIDIA GPU.
+# ==============================================================================
+
+# --- PyTorch CUDA 12.1 index ---
+--extra-index-url https://download.pytorch.org/whl/cu121
+--extra-index-url https://data.dgl.ai/wheels/cu121/repo.html
+
+# ==============================================================================
+# Core scientific stack
+# ==============================================================================
+numpy==1.26.4
+scipy==1.14.1
+pandas==2.2.2
+scikit-learn==1.5.2
+statsmodels==0.14.3
+networkx==3.3
+sympy==1.13.3
+joblib==1.4.2
+threadpoolctl==3.5.0
+
+# ==============================================================================
+# Single-cell / bioinformatics
+# ==============================================================================
+scanpy==1.9.8
+anndata==0.10.9
+leidenalg==0.10.2
+python-igraph==0.11.6
+umap-learn==0.5.6
+pynndescent==0.5.13
+scvi-tools==1.2.0
+scib==1.1.7
+bbknn==1.6.0
+scanorama==1.7.4
+harmony-pytorch==0.1.8
+celltypist==1.6.3
+gseapy==1.1.11
+mudata==0.3.1
+anndata2ri==1.3.2
+acdc-py==1.1.3
+concord-sc==1.0.12
+sccobra==1.0
+scikit-misc==0.5.1
+geosketch==1.3
+fbpca==1.0
+session-info==1.0.0
+mygene==3.2.2
+
+# ==============================================================================
+# Cell atlas / census
+# ==============================================================================
+cellxgene-census==1.16.1
+tiledbsoma==1.14.2
+tiledb==0.32.3
+somacore==1.0.17
+
+# ==============================================================================
+# Visualization
+# ==============================================================================
+matplotlib==3.9.2
+matplotlib-venn==1.1.1
+seaborn==0.13.2
+plotly==5.19.0
+bokeh==3.5.2
+datashader==0.16.3
+holoviews==1.19.1
+panel==1.5.0
+dash==2.18.2
+colorcet==3.1.0
+cmocean==4.0.3
+kaleido==0.2.1
+adjustText==1.2.0
+pydot==4.0.1
+Pillow==11.0.0
+
+# ==============================================================================
+# Spatial / imaging
+# ==============================================================================
+scikit-image==0.20.0
+imageio==2.35.1
+tifffile==2020.10.1
+
+# ==============================================================================
+# Zarr / chunked storage
+# ==============================================================================
+zarr==2.18.3
+numcodecs==0.13.0
+ome-zarr==0.8.3
+kerchunk==0.2.6
+fsspec
+
+# ==============================================================================
+# Data I/O & formats
+# ==============================================================================
+h5py==3.15.1
+pyarrow==16.1.0
+openpyxl==3.1.5
+lxml==5.3.0
+PyYAML==6.0.2
+beautifulsoup4==4.12.3
+SQLAlchemy==2.0.35
+python-duckdb==1.0.0
+
+# ==============================================================================
+# PyTorch + CUDA 12.1
+# ==============================================================================
+torch==2.4.0+cu121
+torchvision==0.19.1+cu121
+torchaudio==2.4.1+cu121
+pytorch-lightning==2.4.0
+torchmetrics==1.4.2
+torch-scatter==2.1.2
+torch-sparse==0.6.18
+torch-optimizer==0.3.0
+pytorch-ranger==0.1.1
+pytorch_geometric==2.7.0
+
+# ==============================================================================
+# DGL (Deep Graph Library)
+# ==============================================================================
+dgl==2.4.0+cu121
+pygcl==0.1.2
+
+# ==============================================================================
+# TensorFlow / JAX
+# ==============================================================================
+tensorflow==2.17.0
+keras==3.5.0
+tensorboard==2.17.1
+jax==0.4.34
+jaxlib==0.4.34
+flax==0.9.0
+optax==0.2.3
+chex==0.1.87
+numpyro==0.15.3
+
+# ==============================================================================
+# RAPIDS (GPU-accelerated analytics) - CUDA 12
+# ==============================================================================
+# NOTE: RAPIDS packages require NVIDIA GPU with CUDA 12.x drivers.
+#       Remove this section entirely if no GPU is available.
+cudf-cu12==24.8.3
+cuml-cu12==24.8.0
+cugraph-cu12==24.8.0
+cuspatial-cu12==24.8.0
+cuvs-cu12==24.8.0
+cucim-cu12==24.8.0
+cuxfilter-cu12==24.8.0
+dask-cuda==24.8.2
+dask-cudf-cu12==24.8.3
+nx-cugraph-cu12==24.8.0
+raft-dask-cu12==24.8.1
+pylibcugraph-cu12==24.8.0
+pylibraft-cu12==24.8.1
+rmm-cu12==24.8.2
+cupy-cuda12x==13.3.0
+cuda-python==12.6.0
+pynvml==11.4.1
+
+# ==============================================================================
+# Dask (distributed computing)
+# ==============================================================================
+dask==2024.7.1
+distributed==2024.7.1
+
+# ==============================================================================
+# Numba
+# ==============================================================================
+numba==0.63.1
+llvmlite==0.46.0
+
+# ==============================================================================
+# Probabilistic programming
+# ==============================================================================
+pyro-ppl==1.9.1
+
+# ==============================================================================
+# Geospatial
+# ==============================================================================
+geopandas==1.0.1
+shapely==2.0.6
+pyproj==3.6.1
+
+# ==============================================================================
+# R interoperability
+# ==============================================================================
+rpy2==3.5.16
+
+# ==============================================================================
+# Vitessce (interactive multi-modal visualization)
+# ==============================================================================
+vitessce==3.3.4
+
+# ==============================================================================
+# AWS / cloud storage
+# ==============================================================================
+boto3==1.35.22
+s3fs==2024.9.0
+aiobotocore==2.15.1
+
+# ==============================================================================
+# Web frameworks
+# ==============================================================================
+Flask==3.0.3
+Flask-Compress==1.15
+Flask-Cors==5.0.0
+Flask-RESTful==0.3.10
+Flask-Talisman==1.1.0
+gunicorn==23.0.0
+uvicorn==0.31.0
+
+# ==============================================================================
+# HTTP / networking
+# ==============================================================================
+requests==2.31.0
+requests-cache==1.2.1
+httpx==0.27.2
+aiohttp
+
+# ==============================================================================
+# Jupyter / IPython
+# ==============================================================================
+jupyterlab==4.2.5
+notebook==7.2.2
+ipykernel==6.29.5
+ipywidgets==8.1.5
+jupyter-server-proxy==4.4.0
+pygwalker
+
+# ==============================================================================
+# Serialization & validation
+# ==============================================================================
+pydantic==2.9.2
+jsonschema==4.23.0
+
+# ==============================================================================
+# MongoDB
+# ==============================================================================
+pymongo==4.10.1
+
+# ==============================================================================
+# Documentation
+# ==============================================================================
+sphinx
+nbsphinx==0.9.8
+
+# ==============================================================================
+# Code quality / build
+# ==============================================================================
+black==24.8.0
+Cython
+
+# ==============================================================================
+# Miscellaneous utilities
+# ==============================================================================
+rich==13.8.1
+xarray==2024.9.0
+hyperopt==0.1.2
+tqdm==4.66.5
+click==8.1.7
+psutil==6.0.0
+intervaltree==3.2.1
+sparse==0.15.4
+natsort==8.4.0
+
+# ==============================================================================
+# scAURA (installed via clone, not pip - see install_tools.sh)
+# ==============================================================================
+# git clone https://github.com/bozdaglab/scAURA.git
+# uv pip install -r scAURA/requirements.txt
+# python scAURA/scAURA_gpu.py      # GPU (>= 2500 cells)
+# python scAURA/scAURA.py           # CPU (< 2500 cells)

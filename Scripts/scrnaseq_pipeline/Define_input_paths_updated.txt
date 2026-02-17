@@ -1,0 +1,606 @@
+================================================================================
+SCRNASEQ PIPELINE - INPUT PATH CONFIGURATION GUIDE
+================================================================================
+
+This document explains how to configure input file paths for the scRNA-seq
+downstream analysis pipeline. The pipeline is designed to be flexible and
+work with files from any location with any naming convention.
+
+Document Version: 2.1
+Last Updated: 2026-01-06
+Compatible with: Dataset-specific directory structure
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+1. QUICK START (MINIMAL CONFIGURATION)
+2. ENVIRONMENT VARIABLE CONFIGURATION (RECOMMENDED)
+3. INPUT FILE REQUIREMENTS
+4. CONFIGURATION OPTIONS IN params.R
+5. SAMPLE SHEET FORMAT
+6. EXAMPLES FOR COMMON SCENARIOS
+7. DIRECTORY STRUCTURE OVERVIEW
+8. TROUBLESHOOTING
+
+================================================================================
+1. QUICK START (MINIMAL CONFIGURATION)
+================================================================================
+
+To run the pipeline on a new dataset, you have TWO options:
+
+  OPTION A: Environment Variables (RECOMMENDED - via submit_all_jobs.sh)
+  OPTION B: Manual Configuration (edit params.R directly)
+
+--------------------------------------------------------------------------------
+OPTION A: ENVIRONMENT VARIABLES (RECOMMENDED)
+--------------------------------------------------------------------------------
+
+The pipeline automatically reads paths from environment variables set by
+submit_all_jobs.sh. This is the preferred method for the preprocessing→downstream
+workflow.
+
+STEP 1: Ensure your samplesheet has the dataset_name column:
+------------------------------------------------------------------------
+
+  sample_name,sex,batch,ventricle,dataset_name,include
+  M_22w_LV,Male,Batch1,LV,Fibroblast_vandenbroucke,TRUE
+  M_22w_4V,Male,Batch1,4V,Fibroblast_vandenbroucke,TRUE
+  F_7w_LV,Female,Batch1,LV,Fibroblast_vandenbroucke,TRUE
+  F_7w_4V,Female,Batch1,4V,Fibroblast_vandenbroucke,TRUE
+
+STEP 2: Run the pipeline using submit_all_jobs.sh:
+------------------------------------------------------------------------
+
+  # For preprocessing (steps 1-9)
+  ./submit_all_jobs.sh --preprocess
+
+  # For downstream analysis (step 10+)
+  ./submit_all_jobs.sh --downstream --ventricle LV
+  ./submit_all_jobs.sh --downstream --ventricle 4V
+
+The script automatically exports:
+  - PROJECT_ROOT: Base project directory
+  - PREPROCESS_DIR: .../Output_dir_<dataset_name>/Single_cell_preprocessed
+  - DOWNSTREAM_DIR: .../Output_dir_<dataset_name>/Single_cell_clustering
+  - DATASET_NAME: From samplesheet column 12
+  - VENTRICLE_FILTER: LV or 4V (for downstream)
+
+--------------------------------------------------------------------------------
+OPTION B: MANUAL CONFIGURATION (params.R)
+--------------------------------------------------------------------------------
+
+If running outside submit_all_jobs.sh, edit params.R directly:
+
+STEP 1: Edit params.R - Set these 4 variables:
+------------------------------------------------------------------------
+
+  # Where are your input RDS files?
+  input_dir <- "/path/to/your/input/files"
+
+  # How are your files named? Use {sample_name} as placeholder
+  input_file_pattern <- "{sample_name}_scCDC_corrected.rds"
+
+  # Are files in subdirectories per sample, or all in one folder?
+  files_in_subdirectories <- TRUE  # New pipeline structure uses subdirs
+
+  # Where should output go?
+  output_base_dir <- "/path/to/output"
+
+STEP 2: Create/edit sample_sheet.csv with your sample information:
+------------------------------------------------------------------------
+
+  sample_name,sex,batch,ventricle,include
+  Sample_A,Male,Batch1,LV,TRUE
+  Sample_B,Female,Batch1,LV,TRUE
+  Sample_C,Male,Batch2,4V,TRUE
+  Sample_D,Female,Batch2,4V,TRUE
+
+
+================================================================================
+2. ENVIRONMENT VARIABLE CONFIGURATION (RECOMMENDED)
+================================================================================
+
+The pipeline supports automatic path configuration via environment variables.
+This is the recommended approach when using the integrated preprocessing +
+downstream workflow.
+
+ENVIRONMENT VARIABLES:
+----------------------
+
+┌─────────────────────┬─────────────────────────────────────────────────────────┐
+│ Variable            │ Description                                             │
+├─────────────────────┼─────────────────────────────────────────────────────────┤
+│ PROJECT_ROOT        │ Base project directory                                  │
+│ PREPROCESS_DIR      │ Path to Single_cell_preprocessed directory              │
+│ DOWNSTREAM_DIR      │ Path to Single_cell_clustering directory                │
+│ DATASET_NAME        │ Dataset identifier (from samplesheet column 12)         │
+│ VENTRICLE_FILTER    │ "LV" or "4V" for ventricle-specific analysis            │
+│ PIPELINE_DIR        │ Path to scrnaseq_pipeline scripts                       │
+└─────────────────────┴─────────────────────────────────────────────────────────┘
+
+HOW params.R RESOLVES PATHS:
+----------------------------
+
+The params.R file uses this priority order:
+
+1. Environment variables (if set):
+   - input_dir = ${PREPROCESS_DIR}/7_scCDC_correction
+   - output_base_dir = ${DOWNSTREAM_DIR}
+
+2. Dataset name derivation (if DATASET_NAME set or found in samplesheet):
+   - input_dir = ${PROJECT_ROOT}/Output_dir_${DATASET_NAME}/Single_cell_preprocessed/7_scCDC_correction
+   - output_base_dir = ${PROJECT_ROOT}/Output_dir_${DATASET_NAME}/Single_cell_clustering
+
+3. Legacy/fallback paths (hardcoded defaults):
+   - For backward compatibility with existing workflows
+
+MANUAL ENVIRONMENT SETUP (for testing):
+---------------------------------------
+
+  export PROJECT_ROOT="/scicore/home/doetsch/kaiser0001/Revision_NatureComm_Sex/Vandebroucke_fibroblast_paper"
+  export DATASET_NAME="Fibroblast_vandenbroucke"
+  export PREPROCESS_DIR="${PROJECT_ROOT}/Output_dir_${DATASET_NAME}/Single_cell_preprocessed"
+  export DOWNSTREAM_DIR="${PROJECT_ROOT}/Output_dir_${DATASET_NAME}/Single_cell_clustering"
+  export VENTRICLE_FILTER="LV"
+  export PIPELINE_DIR="${PROJECT_ROOT}/Scripts/scrnaseq_pipeline"
+
+  # Then run R
+  Rscript ${PIPELINE_DIR}/run_pipeline.R
+
+
+================================================================================
+3. INPUT FILE REQUIREMENTS
+================================================================================
+
+The pipeline expects Seurat v5 RDS files with:
+
+  REQUIRED:
+  - RNA assay with one of these layers: "scCDC_corrected", "counts", or "data"
+  - Cell barcodes as column names
+  - Gene names as row names
+
+  OPTIONAL (will be computed if missing):
+  - nFeature_RNA (genes per cell)
+  - nCount_RNA (UMIs per cell)
+  - percent.mt (mitochondrial percentage)
+
+  METADATA (can be added from sample_sheet.csv if missing):
+  - sample_name or Sample_ID
+  - sex or Sex
+  - batch
+
+The pipeline will automatically:
+  - Detect and use the appropriate counts layer
+  - Map metadata column names (e.g., "Sex" → "sex", "Sample_ID" → "sample_name")
+  - Compute missing QC metrics
+
+INPUT FILE LOCATIONS (New Directory Structure):
+-----------------------------------------------
+
+After preprocessing, scCDC-corrected files are located at:
+
+  ${PREPROCESS_DIR}/7_scCDC_correction/<sample_name>/<sample_name>_scCDC_corrected.rds
+
+Example:
+  Output_dir_Fibroblast_vandenbroucke/
+  └── Single_cell_preprocessed/
+      └── 7_scCDC_correction/
+          ├── M_22w_LV/
+          │   └── M_22w_LV_scCDC_corrected.rds
+          ├── M_22w_4V/
+          │   └── M_22w_4V_scCDC_corrected.rds
+          ├── F_7w_LV/
+          │   └── F_7w_LV_scCDC_corrected.rds
+          └── F_7w_4V/
+              └── F_7w_4V_scCDC_corrected.rds
+
+
+================================================================================
+4. CONFIGURATION OPTIONS IN params.R
+================================================================================
+
+All configuration is done in params.R. Here are the key options:
+
+------------------------------------------------------------------------
+A) ENVIRONMENT VARIABLE DETECTION (Section 0 in params.R)
+------------------------------------------------------------------------
+
+params.R automatically checks for these environment variables:
+  - PROJECT_ROOT
+  - PREPROCESS_DIR
+  - DOWNSTREAM_DIR
+  - DATASET_NAME
+  - VENTRICLE_FILTER
+
+If set, they override manual configuration.
+
+------------------------------------------------------------------------
+B) INPUT DIRECTORY (input_dir)
+------------------------------------------------------------------------
+
+Where your RDS files are located.
+
+With environment variables:
+  input_dir <- file.path(PREPROCESS_DIR, "7_scCDC_correction")
+
+Manual override:
+  input_dir <- "/scicore/home/user/project/processed_data"
+
+------------------------------------------------------------------------
+C) FILE NAMING PATTERN (input_file_pattern)
+------------------------------------------------------------------------
+
+How your files are named. Use {sample_name} as a placeholder.
+
+New pipeline structure (files_in_subdirectories = TRUE):
+  input_file_pattern <- "{sample_name}_scCDC_corrected.rds"
+  # Results in: input_dir/{sample_name}/{sample_name}_scCDC_corrected.rds
+
+Legacy structure (files_in_subdirectories = FALSE):
+  input_file_pattern <- "{sample_name}_qClus_CHOIR_scCDC_corrected.rds"
+  # Results in: input_dir/{sample_name}_qClus_CHOIR_scCDC_corrected.rds
+
+------------------------------------------------------------------------
+D) DIRECTORY STRUCTURE (files_in_subdirectories)
+------------------------------------------------------------------------
+
+Are your files organized in subdirectories per sample?
+
+  files_in_subdirectories <- TRUE   # NEW PIPELINE DEFAULT
+  # Expects: input_dir/sample_A/sample_A.rds
+
+  files_in_subdirectories <- FALSE  # LEGACY
+  # Expects: input_dir/sample_A.rds
+
+The pipeline auto-detects this based on whether PREPROCESS_DIR is set.
+
+------------------------------------------------------------------------
+E) COUNTS LAYER (counts_layer_to_use)
+------------------------------------------------------------------------
+
+Which layer in the Seurat object contains the counts to use.
+
+  counts_layer_to_use <- "auto"            # Auto-detect (recommended)
+  counts_layer_to_use <- "scCDC_corrected" # Use scCDC-corrected counts
+  counts_layer_to_use <- "counts"          # Use raw counts
+
+Auto-detection priority: scCDC_corrected > counts > data
+
+------------------------------------------------------------------------
+F) OUTPUT DIRECTORY (output_base_dir)
+------------------------------------------------------------------------
+
+Where results will be saved.
+
+With environment variables:
+  output_base_dir <- DOWNSTREAM_DIR
+  # Example: .../Output_dir_Fibroblast_vandenbroucke/Single_cell_clustering
+
+Manual override:
+  output_base_dir <- "/scicore/home/user/project/results"
+
+If ventricle analysis is used, output goes to:
+  ${output_base_dir}/10_Downstream_Analysis_LV/
+  ${output_base_dir}/10_Downstream_Analysis_4V/
+
+
+================================================================================
+5. SAMPLE SHEET FORMAT
+================================================================================
+
+The sample sheet is a CSV file that defines your samples and their metadata.
+
+------------------------------------------------------------------------
+REQUIRED COLUMNS:
+------------------------------------------------------------------------
+
+  sample_name   - Unique identifier matching your file names
+  sex           - "Male" or "Female" (case-insensitive)
+  batch         - Batch identifier for integration (e.g., "Batch1")
+
+------------------------------------------------------------------------
+OPTIONAL COLUMNS:
+------------------------------------------------------------------------
+
+  ventricle     - For ventricle-specific analysis ("LV" or "4V")
+  age           - Age information (e.g., "7w", "22w")
+  condition     - Experimental condition
+  include       - TRUE/FALSE to include/exclude samples
+  dataset_name  - Dataset identifier for Output_dir naming (column 12)
+
+------------------------------------------------------------------------
+EXAMPLE SAMPLE SHEETS:
+------------------------------------------------------------------------
+
+MINIMAL (3 columns):
+  sample_name,sex,batch
+  M_22w_LV,Male,Batch1
+  F_7w_LV,Female,Batch1
+  M_22w_4V,Male,Batch1
+  F_7w_4V,Female,Batch1
+
+WITH DATASET NAME (for new directory structure):
+  sample_name,sex,age,batch,ventricle,condition,SRA_accession,ftp_path,local_fastq_dir,genome,include,dataset_name
+  M_22w_LV,Male,22w,Batch1,LV,Control,SRR534,,/path/to/fastqs,GRCm39-2024-A,TRUE,Fibroblast_vandenbroucke
+  F_7w_LV,Female,7w,Batch1,LV,Control,SRR535,,/path/to/fastqs,GRCm39-2024-A,TRUE,Fibroblast_vandenbroucke
+  M_22w_4V,Male,22w,Batch1,4V,Control,SRR538,,/path/to/fastqs,GRCm39-2024-A,TRUE,Fibroblast_vandenbroucke
+  F_7w_4V,Female,7w,Batch1,4V,Control,SRR539,,/path/to/fastqs,GRCm39-2024-A,TRUE,Fibroblast_vandenbroucke
+
+------------------------------------------------------------------------
+NOTES:
+------------------------------------------------------------------------
+
+- sample_name must EXACTLY match the {sample_name} portion of your filenames
+- sex values are case-insensitive ("male", "Male", "MALE" all work)
+- Set include=FALSE to temporarily exclude a sample without deleting it
+- The batch column is used for integration; use the same value for all
+  samples if you don't have batch effects
+- dataset_name (column 12) is used by submit_all_jobs.sh to create
+  Output_dir_<dataset_name>/ directories
+
+
+================================================================================
+6. EXAMPLES FOR COMMON SCENARIOS
+================================================================================
+
+------------------------------------------------------------------------
+SCENARIO 1: New Pipeline Structure (RECOMMENDED)
+------------------------------------------------------------------------
+
+After running preprocessing with submit_all_jobs.sh:
+
+Files:
+  Output_dir_MyDataset/Single_cell_preprocessed/7_scCDC_correction/
+  ├── Sample_A/Sample_A_scCDC_corrected.rds
+  ├── Sample_B/Sample_B_scCDC_corrected.rds
+  └── Sample_C/Sample_C_scCDC_corrected.rds
+
+Configuration (automatic via environment):
+  # submit_all_jobs.sh sets these automatically:
+  # PREPROCESS_DIR=.../Output_dir_MyDataset/Single_cell_preprocessed
+  # DOWNSTREAM_DIR=.../Output_dir_MyDataset/Single_cell_clustering
+
+  # params.R resolves to:
+  input_dir <- file.path(PREPROCESS_DIR, "7_scCDC_correction")
+  input_file_pattern <- "{sample_name}_scCDC_corrected.rds"
+  files_in_subdirectories <- TRUE
+
+Sample sheet:
+  sample_name,sex,batch,dataset_name
+  Sample_A,Male,Batch1,MyDataset
+  Sample_B,Female,Batch1,MyDataset
+  Sample_C,Male,Batch1,MyDataset
+
+------------------------------------------------------------------------
+SCENARIO 2: Legacy Flat Directory Structure
+------------------------------------------------------------------------
+
+Files:
+  /data/CHOIR_Output/M_22w_LV_qClus_CHOIR_scCDC_corrected.rds
+  /data/CHOIR_Output/F_7w_LV_qClus_CHOIR_scCDC_corrected.rds
+
+Configuration (manual in params.R):
+  input_dir <- "/data/CHOIR_Output"
+  input_file_pattern <- "{sample_name}_qClus_CHOIR_scCDC_corrected.rds"
+  files_in_subdirectories <- FALSE
+
+Sample sheet:
+  sample_name,sex,batch,ventricle
+  M_22w_LV,Male,Batch1,LV
+  F_7w_LV,Female,Batch1,LV
+
+------------------------------------------------------------------------
+SCENARIO 3: Cell Ranger Style Subdirectories
+------------------------------------------------------------------------
+
+Files:
+  /data/project/sample_A/sample_A_filtered.rds
+  /data/project/sample_B/sample_B_filtered.rds
+
+Configuration:
+  input_dir <- "/data/project"
+  input_file_pattern <- "{sample_name}_filtered.rds"
+  files_in_subdirectories <- TRUE
+
+Sample sheet:
+  sample_name,sex,batch
+  sample_A,Male,Batch1
+  sample_B,Female,Batch1
+
+------------------------------------------------------------------------
+SCENARIO 4: Multiple Datasets
+------------------------------------------------------------------------
+
+For multiple datasets, use separate Output_dir directories:
+
+  Project/
+  ├── Output_dir_Dataset1/
+  │   ├── Single_cell_preprocessed/
+  │   └── Single_cell_clustering/
+  ├── Output_dir_Dataset2/
+  │   ├── Single_cell_preprocessed/
+  │   └── Single_cell_clustering/
+  └── samplesheet.csv  (with dataset_name column)
+
+Run separately:
+  # Dataset 1
+  ./submit_all_jobs.sh --preprocess   # Uses dataset_name from samplesheet
+  ./submit_all_jobs.sh --downstream --ventricle LV
+
+  # Dataset 2 (update samplesheet or use different one)
+  ./submit_all_jobs.sh --preprocess
+  ./submit_all_jobs.sh --downstream --ventricle LV
+
+
+================================================================================
+7. DIRECTORY STRUCTURE OVERVIEW
+================================================================================
+
+NEW PIPELINE STRUCTURE:
+-----------------------
+
+Project_Directory/
+├── samplesheet.csv                      # Sample metadata
+├── submit_all_jobs.sh                   # Job submission script
+├── Scripts/
+│   ├── Slurm_scripts/                   # Preprocessing scripts (01-09)
+│   │   ├── 01_cellranger_count.sh
+│   │   ├── 02_dropletqc.sh
+│   │   ├── ...
+│   │   └── 10_downstream_analysis.sh
+│   └── scrnaseq_pipeline/               # R downstream pipeline
+│       ├── config/
+│       │   ├── params.R                 # Configuration
+│       │   └── sample_sheet.csv         # R pipeline sample sheet
+│       ├── modules/
+│       │   ├── 00_setup_environment.R
+│       │   ├── 01_load_data.R
+│       │   └── ...
+│       ├── utils/
+│       │   └── functions.R
+│       └── run_pipeline.R
+│
+└── Output_dir_<dataset_name>/           # Dataset-specific outputs
+    ├── Single_cell_preprocessed/        # Steps 1-9 outputs
+    │   ├── 1_CellRanger_output/
+    │   ├── 2_DropletQC_output/
+    │   ├── 3_QClus_output/
+    │   ├── 4_VAEDA_output/
+    │   ├── 5_scDblFinder_output/
+    │   ├── 6_DoubletFinder_output/
+    │   ├── 7_scCDC_correction/          # INPUT FOR DOWNSTREAM
+    │   │   ├── <sample1>/
+    │   │   │   └── <sample1>_scCDC_corrected.rds
+    │   │   └── <sample2>/
+    │   │       └── <sample2>_scCDC_corrected.rds
+    │   ├── 8_AnnData_conversion/
+    │   └── 9_Scanpy_output/
+    │
+    └── Single_cell_clustering/          # Step 10+ outputs
+        ├── 10_Downstream_Analysis_LV/   # Lateral ventricle analysis
+        │   ├── objects/
+        │   ├── plots/
+        │   ├── tables/
+        │   └── reports/
+        └── 10_Downstream_Analysis_4V/   # 4th ventricle analysis
+            ├── objects/
+            ├── plots/
+            ├── tables/
+            └── reports/
+
+
+================================================================================
+8. TROUBLESHOOTING
+================================================================================
+
+------------------------------------------------------------------------
+ERROR: "Input file not found for sample X"
+------------------------------------------------------------------------
+
+Check that:
+1. The file exists at the expected path
+2. Your input_file_pattern matches the actual filename
+3. The sample_name in sample_sheet.csv exactly matches your file
+4. files_in_subdirectories setting matches your directory structure
+
+Debug command:
+  # In R, check what path is being generated:
+  source("config/params.R")
+  print(params$input_paths)
+
+------------------------------------------------------------------------
+ERROR: Environment variables not being read
+------------------------------------------------------------------------
+
+Verify environment variables are set:
+  echo $PREPROCESS_DIR
+  echo $DOWNSTREAM_DIR
+  echo $DATASET_NAME
+
+In R, check:
+  Sys.getenv("PREPROCESS_DIR")
+  Sys.getenv("DOWNSTREAM_DIR")
+
+------------------------------------------------------------------------
+ERROR: "No scCDC_corrected layer found"
+------------------------------------------------------------------------
+
+Your files might use a different layer name. Check available layers:
+  library(Seurat)
+  obj <- readRDS("your_file.rds")
+  print(Layers(obj[["RNA"]]))
+
+Then set counts_layer_to_use in params.R:
+  counts_layer_to_use <- "counts"  # or whatever layer exists
+
+------------------------------------------------------------------------
+ERROR: "Sample sheet missing required columns"
+------------------------------------------------------------------------
+
+Ensure your CSV has at minimum: sample_name, sex, batch
+
+Check for:
+- Typos in column names
+- Extra spaces in headers
+- Wrong delimiter (must be comma, not semicolon)
+
+------------------------------------------------------------------------
+ERROR: Wrong output directory created
+------------------------------------------------------------------------
+
+Check:
+1. DATASET_NAME environment variable is set correctly
+2. dataset_name column exists in samplesheet (column 12)
+3. DOWNSTREAM_DIR points to correct location
+
+Debug:
+  echo "DATASET_NAME: $DATASET_NAME"
+  echo "DOWNSTREAM_DIR: $DOWNSTREAM_DIR"
+
+------------------------------------------------------------------------
+WARNING: "Metadata column 'sex' not found, using 'Sex'"
+------------------------------------------------------------------------
+
+This is just informational. The pipeline automatically maps common column
+name variations. No action needed.
+
+------------------------------------------------------------------------
+Files have different structures/layers
+------------------------------------------------------------------------
+
+All input files must have the same structure. If files were processed
+differently, you may need to standardize them first or ensure the
+counts_layer_to_use setting works for all files.
+
+
+================================================================================
+CONFIGURATION CHECKLIST
+================================================================================
+
+Before running the pipeline, verify:
+
+FOR ENVIRONMENT VARIABLE METHOD:
+[ ] samplesheet.csv has dataset_name column (column 12)
+[ ] submit_all_jobs.sh is configured correctly
+[ ] Preprocessing completed successfully (7_scCDC_correction/ populated)
+
+FOR MANUAL CONFIGURATION:
+[ ] input_dir points to the correct directory
+[ ] input_file_pattern matches your file naming convention
+[ ] files_in_subdirectories matches your directory structure
+[ ] sample_sheet.csv exists and has correct format
+[ ] All sample_name values in CSV match {sample_name} in filenames
+[ ] All input files exist and are readable
+[ ] output_base_dir is writable
+
+Quick validation:
+  # Test environment variables
+  ./submit_all_jobs.sh --validate
+
+  # Test R configuration
+  export PREPROCESS_DIR=...
+  export DOWNSTREAM_DIR=...
+  Rscript -e "source('Scripts/scrnaseq_pipeline/config/params.R'); print(params$input_paths)"
+
+================================================================================
