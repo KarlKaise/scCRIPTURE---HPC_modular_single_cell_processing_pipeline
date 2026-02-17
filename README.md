@@ -441,26 +441,28 @@ project_root/
 
 If you use this pipeline, please cite the individual tools used in each step:
 
-Cell Ranger: 10x Genomics. DOI: 10.1038/ncomms14049
-DropletQC: Muskovic & Powell (2021). DOI: 10.1186/s13059-021-02547-0
-QClus: Schmauch et al. (2024). DOI: 10.1093/nar/gkae1145
-VAEDA: Doublet detection via variational autoencoder. DOI: 10.1093/bioinformatics/btac720
-scDblFinder: Germain et al. (2022). DOI: 10.12688/f1000research.73600.2
-DoubletFinder: McGinnis et al. (2019). DOI: 10.1016/j.cels.2019.03.003
-scCDC: Contamination correction. DOI: 10.1186/s13059-024-03284-w
-DecontX: Yang et al. (2020). DOI: 10.1186/s13059-020-1950-6
-scKWARN: Hsu et al. (2024). DOI: 10.1093/bioinformatics/btae008
-CHOIR: Hierarchical clustering. DOI: 10.1038/s41588-025-02148-8
-scICE: Consistent subclustering. DOI: 10.1038/s41467-025-60702-8
-IDclust: Prompsy et al. (2024). DOI: 10.1093/nargab/lqae174
-Seurat: Hao et al. (2024). DOI: 10.1038/s41587-023-01767-y
-scVI-tools: Gayoso et al. (2022). DOI: 10.1038/s41587-021-01206-w
-CONCORD: Zhu et al. (2026). DOI: 10.1038/s41587-025-02950-z
-scCobra: Zhao et al. (2025). DOI: 10.1038/s42003-025-07692-x
-scAURA: Rifat et al. (2026), bioRxiv preprint. DOI: 10.64898/2026.01.25.701579
-MapMyCells: Yao et al. (2023), Allen Institute for Brain Science — https://knowledge.brain-map.org/mapmycells/process. DOI: 10.1038/s41586-023-06812-z
-MAST: Finak et al. (2015). DOI: 10.1186/s13059-015-0844-5
-DREAM: Hoffman et al. (2023), bioRxiv preprint. DOI: 10.1101/2023.03.17.533005
+| Tool | Reference | DOI |
+|------|-----------|-----|
+| **Cell Ranger** | 10x Genomics | [`10.1038/ncomms14049`](https://doi.org/10.1038/ncomms14049) |
+| **DropletQC** | Muskovic & Powell (2021) | [`10.1186/s13059-021-02547-0`](https://doi.org/10.1186/s13059-021-02547-0) |
+| **QClus** | Schmauch et al. (2024) | [`10.1093/nar/gkae1145`](https://doi.org/10.1093/nar/gkae1145) |
+| **VAEDA** | Doublet detection via variational autoencoder | [`10.1093/bioinformatics/btac720`](https://doi.org/10.1093/bioinformatics/btac720) |
+| **scDblFinder** | Germain et al. (2022) | [`10.12688/f1000research.73600.2`](https://doi.org/10.12688/f1000research.73600.2) |
+| **DoubletFinder** | McGinnis et al. (2019) | [`10.1016/j.cels.2019.03.003`](https://doi.org/10.1016/j.cels.2019.03.003) |
+| **scCDC** | Contamination correction | [`10.1186/s13059-024-03284-w`](https://doi.org/10.1186/s13059-024-03284-w) |
+| **DecontX** | Yang et al. (2020) | [`10.1186/s13059-020-1950-6`](https://doi.org/10.1186/s13059-020-1950-6) |
+| **scKWARN** | Hsu et al. (2024) | [`10.1093/bioinformatics/btae008`](https://doi.org/10.1093/bioinformatics/btae008) |
+| **CHOIR** | Hierarchical clustering | [`10.1038/s41588-025-02148-8`](https://doi.org/10.1038/s41588-025-02148-8) |
+| **scICE** | Consistent subclustering | [`10.1038/s41467-025-60702-8`](https://doi.org/10.1038/s41467-025-60702-8) |
+| **IDclust** | Prompsy et al. (2024) | [`10.1093/nargab/lqae174`](https://doi.org/10.1093/nargab/lqae174) |
+| **Seurat** | Hao et al. (2024) | [`10.1038/s41587-023-01767-y`](https://doi.org/10.1038/s41587-023-01767-y) |
+| **scVI-tools** | Gayoso et al. (2022) | [`10.1038/s41587-021-01206-w`](https://doi.org/10.1038/s41587-021-01206-w) |
+| **CONCORD** | Zhu et al. (2026) | [`10.1038/s41587-025-02950-z`](https://doi.org/10.1038/s41587-025-02950-z) |
+| **scCobra** | Zhao et al. (2025) | [`10.1038/s42003-025-07692-x`](https://doi.org/10.1038/s42003-025-07692-x) |
+| **scAURA** | Rifat et al. (2026, preprint) | [`10.64898/2026.01.25.701579`](https://doi.org/10.64898/2026.01.25.701579) |
+| **MapMyCells** | Yao et al. (2023) — [Allen Institute](https://knowledge.brain-map.org/mapmycells/process) | [`10.1038/s41586-023-06812-z`](https://doi.org/10.1038/s41586-023-06812-z) |
+| **MAST** | Finak et al. (2015) | [`10.1186/s13059-015-0844-5`](https://doi.org/10.1186/s13059-015-0844-5) |
+| **dreamlet** | Hoffman et al. (2023, preprint) | [`10.1101/2023.03.17.533005`](https://doi.org/10.1101/2023.03.17.533005) |
 
 ---
 
